@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref } from 'vue';
-
+import { computed, onBeforeMount, onMounted, reactive, ref } from 'vue';
 import { TipoCursoStore } from '../store/TipoCursoStore';
-
 import { useRouter } from 'vue-router';
-import { ITipoCurso } from '../domain/ITipoCurso';
-
 import CategoriaDB from '../db/categoria.json';
-
 import NivelEnsinoDB from '../db/nivelEnsino.json';
+import { ICategoria } from '../domain/ICategoria';
+import { INivelEnsino } from '../domain/INivelEnsino';
+import { ITipoCursoLista } from '../domain/ITipoCursoLista';
 
 const router = useRouter();
 
 const storeTipoCurso = TipoCursoStore();
 
-const categoria = ref('');
-const nivelEnsino = ref('');
-const descricao = ref('');
+const selectedTipoCurso = computed(() => storeTipoCurso.getSelectedTipoCurso());
+
+let selectedCategoria = ref(0);
+let selectedNivelEnsino = ref(0);
+let descricao = ref('');
+const modoSalvar = ref('inserir');
 
 const onClickedHome = () => {
     router.push({ name: 'home' });
@@ -25,31 +26,54 @@ const onClickedVoltar = () => {
     router.push({ name: 'tipo' });
 };
 
-const salvar = async () => {
-    const tipoCurso = {
-        id: Math.random(),
-        categoria: categoria.value,
-        nivelEnsino: nivelEnsino.value,
-        descricao: descricao.value
-    };
-    console.log('tipo: ', tipoCurso);
-    storeTipoCurso.adicionarTipoCurso(tipoCurso);
+const onClickedSalvar = async () => {
+    const [categoria] = CategoriaDB.filter(
+        (c) => c.id == selectedCategoria.value
+    );
+    const [nivelEnsino] = NivelEnsinoDB.filter(
+        (n) => n.id == selectedNivelEnsino.value
+    );
+
+    if (modoSalvar.value == 'inserir') {
+        const tipoCurso = {
+            id: Math.random(),
+            categoria: categoria,
+            nivelEnsino: nivelEnsino,
+            descricao: descricao.value
+        };
+        console.log('tipo: ', tipoCurso);
+
+        await storeTipoCurso.adicionarTipoCurso(tipoCurso);
+    } else {
+        console.log('antigo ', selectedTipoCurso.value);
+        const tipoCurso = {
+            id: selectedTipoCurso.value.id,
+            categoria: categoria,
+            nivelEnsino: nivelEnsino,
+            descricao: descricao.value
+        };
+        console.log('tipo: ', tipoCurso);
+        await storeTipoCurso.alterarTipoCurso(tipoCurso);
+    }
+
     router.push({ name: 'tipo' });
 };
 
 onBeforeMount(() => {
     console.log('antes de mounted....');
 });
+
 onMounted(() => {
     console.log('mounted....');
-    const tipocurso: ITipoCurso = storeTipoCurso.getSelectedTipoCurso();
+    const tipocurso: ITipoCursoLista = storeTipoCurso.getSelectedTipoCurso();
+    console.log('tipo..', tipocurso);
     if (tipocurso) {
-        categoria.value = tipocurso.categoria;
-        nivelEnsino.value = tipocurso.nivelEnsino;
+        modoSalvar.value = 'editar';
+        console.log('testando..');
+        selectedCategoria.value = tipocurso.categoria.id;
+        selectedNivelEnsino.value = tipocurso.nivelEnsino.id;
         descricao.value = tipocurso.descricao;
-    }
-    console.log(tipocurso);
-    console.log(categoria.value);
+    } else modoSalvar.value = 'inserir';
 });
 </script>
 
@@ -87,12 +111,16 @@ onMounted(() => {
                     <label for="" class="text-gray-600 font-bold"
                         >Categoria</label
                     >
-                    <select name="categoria" id="categoria" v-model="categoria">
+                    <select
+                        name="categoria"
+                        id="categoria"
+                        v-model="selectedCategoria"
+                    >
                         <option value="0">Selecione uma categoria</option>
                         <option
                             v-for="categoria in CategoriaDB"
                             :key="categoria.id"
-                            value="categoria.id"
+                            :value="categoria.id"
                         >
                             {{ categoria.descricao }}
                         </option>
@@ -102,13 +130,14 @@ onMounted(() => {
                     <label for="" class="text-gray-600 font-bold"
                         >Nível Ensino</label
                     >
-                    <select>
+                    <select v-model="selectedNivelEnsino">
+                        <option value="0">Selecione Nivel de Ensino</option>
                         <option
                             v-for="nivelEnsino in NivelEnsinoDB"
                             :key="nivelEnsino.id"
-                            value="nivelEnsino.id"
+                            :value="nivelEnsino.id"
                         >
-                            {{ nivelEnsino }}
+                            {{ nivelEnsino.descricao }}
                         </option>
                     </select>
                 </div>
@@ -124,9 +153,7 @@ onMounted(() => {
                     v-model="descricao"
                 />
             </div>
-            <div>
-                {{ CategoriaDB }}
-            </div>
+
             <div class="w-full p-2 text-center space-x-16">
                 <button
                     @click="onClickedVoltar"
@@ -135,12 +162,14 @@ onMounted(() => {
                     Voltar
                 </button>
                 <button
-                    @click="salvar"
+                    @click="onClickedSalvar"
                     class="py-2 px-1 bg-blue-500 hover:bg-blue-700 text-white font-bold border rounded"
                 >
                     Salvar
                 </button>
             </div>
+
+            <div>{{ selectedTipoCurso }}</div>
         </div>
     </div>
 </template>

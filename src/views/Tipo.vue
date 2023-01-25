@@ -127,10 +127,10 @@
                             {{ item.descricao }}
                         </div>
                         <div class="w-1/4">
-                            {{ item.nivelEnsino }}
+                            {{ item.nivelEnsino.descricao }}
                         </div>
                         <div class="w-1/3">
-                            {{ item.categoria }}
+                            {{ item.categoria.descricao }}
                         </div>
                         <div class="flex w-1/6 items-center space-x-5">
                             <button
@@ -181,11 +181,9 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-
-import { reactive, ref, computed } from 'vue';
-import { ITipoCurso } from '../domain/ITipocurso';
-
+import { ref, computed } from 'vue';
 import { TipoCursoStore } from '../store/TipoCursoStore';
+import { ITipoCursoLista } from '../domain/ITipoCursoLista';
 
 const router = useRouter();
 
@@ -207,6 +205,7 @@ const pesquisar = ref('');
 const errorMsg = ref('');
 
 const onClickedManter = () => {
+    storeTipoCurso.setarSelectedTipoCurso(null);
     router.push({ name: 'tipoEditar' });
 };
 
@@ -218,47 +217,12 @@ const onClickedtipo = () => {
     router.push({ name: 'tipo' });
 };
 
-const onClickedBtnExcluir = (item: ITipoCurso) => {
+const onClickedBtnExcluir = (item: ITipoCursoLista) => {
     storeTipoCurso.apagarTipoCurso(item);
 };
 
-const onClickedBtnEditar = (item: ITipoCurso) => {
+const onClickedBtnEditar = (item: ITipoCursoLista) => {
     storeTipoCurso.setarSelectedTipoCurso(item);
     router.push({ name: 'tipoEditar' });
 };
-
-// const tipocurso = computed(() => storeTipoCurso.getTipocurso());
-
-// const adicionarTipocurso = () => {
-//     try {
-//         storeTipouurso.adicionarTipoCurso(pesquisar.value);
-//     } catch (error: any) {
-//         // console.log(error);
-//         errorMsg.value = error.message;
-//     }
-
-// const apagarpequisa = (tipocurso: ITipoCurso) => {
-//     storeTipoCurso.apagarTipocurso(tipocurso);
-// };
-
-// const dados = [
-//     {
-//         id: 1,
-//         descricao: 'teste 1',
-//         nivelEnsino: 'basico',
-//         categoria: 'curso formacao'
-//     },
-//     {
-//         id: 2,
-//         descricao: 'teste 2',
-//         nivelEnsino: 'basico',
-//         categoria: 'curso formacao'
-//     },
-//     {
-//         id: 3,
-//         descricao: 'teste 3',
-//         nivelEnsino: 'basico',
-//         categoria: 'curso formacao'
-//     }
-// ];
 </script>

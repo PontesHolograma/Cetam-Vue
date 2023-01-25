@@ -1,6 +1,6 @@
 [
-    { "id": 1, "nivelEnsino": "basico" },
-    { "id": 2, "nivelEnsino": "tecnico" },
-    { "id": 3, "nivelEnsino": "tecnologo" },
-    { "id": 4, "nivelEnsino": "pos graduacao" }
+    { "id": 1, "descricao": "basico" },
+    { "id": 2, "descricao": "tecnico" },
+    { "id": 3, "descricao": "tecnologo" },
+    { "id": 4, "descricao": "pos graduacao" }
 ]

@@ -1,13 +1,15 @@
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
+import { ICategoria } from '../domain/ICategoria';
 import { ITipoCursoLista } from '../domain/ITipoCursoLista';
 import { ITipoCurso } from './../domain/ITipoCurso';
+import { INivelEnsino } from './../domain/INivelEnsino';
 
 const tipoCursoInit = {
     id: 0,
     descricao: '',
-    nivelEnsino: '',
-    categoria: ''
+    nivelEnsino: {} as INivelEnsino,
+    categoria: {} as ICategoria
 };
 
 export const TipoCursoStore = defineStore('tipoCursoStore', () => {
@@ -22,17 +24,17 @@ export const TipoCursoStore = defineStore('tipoCursoStore', () => {
             {
                 id: 2,
                 descricao: 'teste 2',
-                nivelEnsino: 'basico',
-                categoria: 'curso formacao'
+                nivelEnsino: { id: 1, descricao: 'basico' },
+                categoria: { id: 1, descricao: 'curso formacao' }
             },
             {
                 id: 3,
                 descricao: 'teste 3',
-                nivelEnsino: 'basico',
-                categoria: 'curso formacao'
+                nivelEnsino: { id: 1, descricao: 'basico' },
+                categoria: { id: 1, descricao: 'curso formacao' }
             }
         ] as ITipoCursoLista[],
-        selectedTipoCurso: tipoCursoInit as ITipoCurso
+        selectedTipoCurso: tipoCursoInit as ITipoCursoLista
     });
 
     const getTipoCurso = () => {
@@ -42,14 +44,14 @@ export const TipoCursoStore = defineStore('tipoCursoStore', () => {
         return data.selectedTipoCurso;
     };
 
-    const adicionarTipoCurso = async (item: ITipoCurso): Promise<void> => {
-        return new Promise((resolve) => {
-            data.tipoCurso.push(item);
-            resolve();
-        });
+    const adicionarTipoCurso = async (item: ITipoCursoLista): Promise<void> => {
+        // return new Promise((resolve) => {
+        data.tipoCurso.push(item);
+        // resolve();
+        // });
     };
 
-    const apagarTipoCurso = (tipoCurso: ITipoCurso) => {
+    const apagarTipoCurso = (tipoCurso: ITipoCursoLista) => {
         console.log(tipoCurso);
         data.tipoCurso.splice(
             data.tipoCurso.findIndex((t) => t.id == tipoCurso.id),
@@ -57,7 +59,19 @@ export const TipoCursoStore = defineStore('tipoCursoStore', () => {
         );
     };
 
-    const setarSelectedTipoCurso = (tipoCurso: ITipoCurso | null) => {
+    const alterarTipoCurso = async (
+        tipoCurso: ITipoCursoLista
+    ): Promise<void> => {
+        data.tipoCurso.map((t) => {
+            if (t.id == tipoCurso.id) {
+                t.descricao = tipoCurso.descricao;
+                t.categoria = tipoCurso.categoria;
+                t.nivelEnsino = tipoCurso.nivelEnsino;
+            }
+        });
+    };
+
+    const setarSelectedTipoCurso = (tipoCurso: ITipoCursoLista | null) => {
         if (tipoCurso) {
             data.selectedTipoCurso = tipoCurso;
         } else {
@@ -70,6 +84,7 @@ export const TipoCursoStore = defineStore('tipoCursoStore', () => {
         adicionarTipoCurso,
         apagarTipoCurso,
         setarSelectedTipoCurso,
-        getSelectedTipoCurso
+        getSelectedTipoCurso,
+        alterarTipoCurso
     };
 });
