@@ -1,0 +1,6 @@
+[
+    { "id": 1, "nivelEnsino": "basico" },
+    { "id": 2, "nivelEnsino": "tecnico" },
+    { "id": 3, "nivelEnsino": "tecnologo" },
+    { "id": 4, "nivelEnsino": "pos graduacao" }
+]
